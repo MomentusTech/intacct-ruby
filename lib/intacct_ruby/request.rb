@@ -1,11 +1,11 @@
-require 'builder'
+require "builder"
 
-require 'intacct_ruby/api'
-require 'intacct_ruby/response'
-require 'intacct_ruby/function'
+require "intacct_ruby/api"
+require "intacct_ruby/response"
+require "intacct_ruby/function"
 
-require 'intacct_ruby/exceptions/insufficient_credentials_exception'
-require 'intacct_ruby/exceptions/empty_request_exception'
+require "intacct_ruby/exceptions/insufficient_credentials_exception"
+require "intacct_ruby/exceptions/empty_request_exception"
 
 module IntacctRuby
   # An outgoing request to the Intacct API. Can have multiple functions.
@@ -17,7 +17,7 @@ module IntacctRuby
       uniqueid: false,
       dtdversion: 3.0,
       includewhitespace: false,
-      transaction: true
+      transaction: true,
     }.freeze
 
     REQUIRED_AUTHENTICATION_KEYS = [
@@ -25,7 +25,7 @@ module IntacctRuby
       :sender_password,
       :userid,
       :companyid,
-      :user_password
+      :user_password,
     ].freeze
 
     def initialize(*functions, request_params)
@@ -39,14 +39,14 @@ module IntacctRuby
 
     def to_xml
       @to_xml ||= begin
-        @request = Builder::XmlMarkup.new
+          @request = Builder::XmlMarkup.new
 
-        @request.instruct!
-        @request.request do
-          control_block
-          operation_block
+          @request.instruct!
+          @request.request do
+            control_block
+            operation_block
+          end
         end
-      end
     end
 
     def send(opts = {})
@@ -79,7 +79,7 @@ module IntacctRuby
     def validate_functions!
       unless functions.any?
         raise Exceptions::EmptyRequestException,
-              'a successful request must contain at least one function'
+              "a successful request must contain at least one function"
       end
     end
 
@@ -90,9 +90,9 @@ module IntacctRuby
         missing_keys.map! { |s| ":#{s}" } # so they appear as symbols in output
 
         raise Exceptions::InsufficientCredentialsException,
-              "[#{missing_keys.join(', ')}] required for a valid request. "
-              'All authentication-related keys should be provided on ' \
-              'instantiation in IntacctRuby::Request#new'
+              "[#{missing_keys.join(", ")}] required for a valid request. "
+        "All authentication-related keys should be provided on " \
+        "instantiation in IntacctRuby::Request#new"
       end
     end
 
@@ -107,19 +107,19 @@ module IntacctRuby
 
         # As recommended by Intacct API reference. This ID should be unique
         # to the call: it's used to associate a response with a request.
-        @request.controlid          timestamp
-        @request.uniqueid           @opts[:uniqueid]
-        @request.dtdversion         @opts[:dtdversion]
-        @request.includewhitespace  @opts[:includewhitespace]
+        @request.controlid timestamp
+        @request.uniqueid @opts[:uniqueid]
+        @request.dtdversion @opts[:dtdversion]
+        @request.includewhitespace @opts[:includewhitespace]
       end
     end
 
     def authentication_block
       @request.authentication do
         @request.login do
-          @request.userid    @opts[:userid]
+          @request.userid @opts[:userid]
           @request.companyid @opts[:companyid]
-          @request.password  @opts[:user_password]
+          @request.password @opts[:user_password]
         end
       end
     end
